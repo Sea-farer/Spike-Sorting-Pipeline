@@ -280,11 +280,15 @@ def compute_rotation_matrix(rb):
 
 
 if __name__ == "__main__":
-    paths = {
-        "good": r"N:\bigmaze\Data\Ratvissant\20180611\1",
-        "bad_123": r"N:\valentno\Data\Ratvissant\20190124\1",
-        "bad_122": r"N:\valentno\Data\Ratvissant\20181012\1",
+    # Demo: replace with your own project-relative paths, e.g. PROJ / "data/.../Optitrack.csv"
+    example_paths = {
+        "sessionA": "data/example_session_A/Optitrack/Optitrack.csv",
+        "sessionB": "data/example_session_B/Optitrack/Optitrack.csv",
     }
     opti = {}
-    for key, path in paths.items():
-        opti[key] = OptiCSV(path + r"\Optitrack\Optitrack.csv")
+    for key, rel_path in example_paths.items():
+        try:
+            opti[key] = OptiCSV(rel_path)
+        except FileNotFoundError:
+            # Skip if example files are not present
+            pass
