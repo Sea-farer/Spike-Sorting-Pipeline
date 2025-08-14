@@ -1,0 +1,126 @@
+{
+  "manifest_version": "1.0",
+  "name": "ca1-tetrode-placemaps",
+  "root": ".",
+  "python": {
+    "recommended_version": "3.10",
+    "dependencies_file": "requirements.txt",
+    "dependencies": [
+      "numpy",
+      "scipy",
+      "matplotlib",
+      "pandas",
+      "neo",
+      "spikeinterface",
+      "h5py"
+    ],
+    "module_root": "src",
+    "import_hint": "Use 'from src.<module> import <symbol>' in scripts; in notebooks, prepend project root to sys.path before imports."
+  },
+  "entrypoints": {
+    "notebooks": [
+      {
+        "path": "notebooks/01_quickstart.ipynb",
+        "purpose": "End-to-end quickstart: locate session files, load Axona .pos, basic plots, load units."
+      }
+    ]
+  },
+  "packages": [
+    {
+      "path": "src/",
+      "description": "Project Python package root"
+    },
+    {
+      "path": "src/scripts/",
+      "description": "Auxiliary loaders for Axona/Neuralynx/MClust and utilities"
+    }
+  ],
+  "modules": {
+    "src/io_axona.py": {
+      "purpose": "Axona I/O without pyxona: .pos parser, .t64 loader, session file discovery",
+      "exports": [
+        "find_session_files(session_dir)",
+        "load_pos_axona(pos_path)",
+        "load_units_t64(session_dir)",
+        "load_units_mclust(session_dir)"
+      ]
+    },
+    "src/analysis.py": {
+      "purpose": "Plotting and analysis helpers for occupancy, rate maps, and path visualization",
+      "exports": [
+        "plot_arena(pos_df)",
+        "occupancy_map(pos_df, bins=40)",
+        "center_mask(bins, center_frac=0.5)",
+        "plot_coverage(pos_df, bins=40, center_frac=0.5)",
+        "rate_map(pos_df, spike_ts, bins=40, sigma=1.0)",
+        "plot_rate_map(R, title='Rate map (Hz)')",
+        "path_plus_spikes(pos_df, spike_ts)"
+      ]
+    },
+    "src/scripts/axona.py": { "purpose": "Axona session loader (partial/in-progress)" },
+    "src/scripts/mclust.py": { "purpose": "MClust cuts loader and helpers" },
+    "src/scripts/neuralynx.py": { "purpose": "Neuralynx related utilities" },
+    "src/scripts/opticsv.py": { "purpose": "OptiCSV or optics-related utilities" },
+    "src/scripts/utils.py": { "purpose": "Shared utility functions" }
+  },
+  "data": {
+    "root": "data/Blackstad_CA1/",
+    "session_pattern": "data/Blackstad_CA1/<subject_id>/<YYYY-MM-DD>/",
+    "examples": [
+      "data/Blackstad_CA1/24116/2018-04-05/",
+      "data/Blackstad_CA1/24116/2018-04-03/"
+    ],
+    "files_expected": {
+      "position": "*.pos",
+      "settings": "*.set",
+      "tetrodes": "*.{1..8}",
+      "cuts": "*_*.t64 or TT*.t64",
+      "eeg": "*.eeg* or *.EEG*"
+    }
+  },
+  "conventions": {
+    "arena_cm": 150,
+    "pos_units": "Positions converted from camera pixels to centimeters using 'pixels_per_metre' in .pos header.",
+    "timebase": "Position sampled at 'sample_rate' Hz as per .pos header; spikes scaled using SPK_FS=48000 for .t64"
+  },
+  "how_to_use": [
+    "In notebooks, run a cell to add the project root to sys.path, then: from src.io_axona import find_session_files, load_pos_axona",
+    "Call find_session_files(session_dir) to resolve *.pos/*.set/*.t64",
+    "Use load_pos_axona(files['pos']) to get a DataFrame with columns: t,x,y,ang,valid,speed,keep",
+    "Use analysis helpers to visualize: plot_arena(pos_df), plot_coverage(pos_df), rate_map(...)"
+  ],
+  "tree": {
+    "files": [
+      "requirements.txt"
+    ],
+    "dirs": {
+      "src": {
+        "files": ["analysis.py", "io_axona.py"],
+        "dirs": {
+          "scripts": {
+            "files": ["axona.py", "mclust.py", "neuralynx.py", "opticsv.py", "utils.py"]
+          },
+          "__pycache__": {
+            "files": ["analysis.cpython-*.pyc", "io_axona.cpython-*.pyc"]
+          }
+        }
+      },
+      "notebooks": {
+        "files": ["01_quickstart.ipynb"]
+      },
+      "data": {
+        "dirs": {
+          "Blackstad_CA1": {
+            "dirs": {
+              "24116": {
+                "dirs": ["2018-04-03", "2018-04-05", "2018-04-06", "2018-04-19", "2018-04-20", "2018-04-22", "2018-04-25", "2018-04-26", "2018-04-27", "2018-04-30", "2018-05-02", "2018-05-03", "2018-05-04"]
+              }
+            }
+          }
+        }
+      },
+      "docs": {},
+      "figures": {}
+    }
+  }
+}
