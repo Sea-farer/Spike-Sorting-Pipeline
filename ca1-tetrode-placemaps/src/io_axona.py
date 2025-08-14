@@ -1,4 +1,4 @@
-"""
+"""Axona I/O utilities (no pyxona dependency).
 
 This module provides:
   - find_session_files(session_dir)

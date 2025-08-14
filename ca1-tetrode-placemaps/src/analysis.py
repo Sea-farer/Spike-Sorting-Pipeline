@@ -6,6 +6,10 @@ from scipy.ndimage import gaussian_filter
 ARENA_CM = 150  # keep in sync with io_axona.py
 
 def plot_arena(pos_df):
+    """Plot speed-filtered trajectory within a 150 cm square arena.
+
+    Expects a DataFrame from load_pos_axona with columns t, x, y, keep.
+    """
     plt.figure(figsize=(6,6))
     k = pos_df[pos_df["keep"]]
     plt.plot(k["x"], k["y"], lw=0.5)
@@ -16,6 +20,10 @@ def plot_arena(pos_df):
     plt.show()
 
 def occupancy_map(pos_df, bins=40):
+    """Compute occupancy (seconds) per spatial bin.
+
+    Returns (occupancy_2d, x_edges, y_edges).
+    """
     k = pos_df[pos_df["keep"]]
     H, xe, ye = np.histogram2d(k["x"], k["y"], bins=bins, range=[[0,ARENA_CM],[0,ARENA_CM]])
     # 50Hz tracker → seconds
@@ -23,12 +31,14 @@ def occupancy_map(pos_df, bins=40):
     return occ, xe, ye
 
 def center_mask(bins, center_frac=0.5):
+    """Boolean mask for the central region occupying center_frac of each side."""
     M = np.zeros((bins,bins), dtype=bool)
     s = int(np.round(bins*(1-center_frac)/2))
     M[s:bins-s, s:bins-s] = True
     return M
 
 def plot_coverage(pos_df, bins=40, center_frac=0.5):
+    """Show occupancy heatmap and center mask coverage summary."""
     occ, xe, ye = occupancy_map(pos_df, bins)
     M = center_mask(occ.shape[0], center_frac)
     center_time = float(occ[M].sum())
@@ -45,6 +55,7 @@ def plot_coverage(pos_df, bins=40, center_frac=0.5):
     plt.show()
 
 def rate_map(pos_df, spike_ts, bins=40, sigma=1.0):
+    """Compute Gaussian-smoothed firing rate map (Hz) over space."""
     occ, xe, ye = occupancy_map(pos_df, bins)
     k = pos_df[pos_df["keep"]]
     t = k["t"].to_numpy(); x = k["x"].to_numpy(); y = k["y"].to_numpy()
@@ -58,11 +69,13 @@ def rate_map(pos_df, spike_ts, bins=40, sigma=1.0):
     return R
 
 def plot_rate_map(R, title="Rate map (Hz)"):
+    """Plot a 2D rate map with arena extent labels."""
     plt.figure(figsize=(5,5))
     plt.imshow(R, origin="lower", extent=[0,ARENA_CM,0,ARENA_CM])
     plt.title(title); plt.colorbar(); plt.show()
 
 def path_plus_spikes(pos_df, spike_ts):
+    """Overlay spikes on the animal's path (speed-filtered)."""
     k = pos_df[pos_df["keep"]]
     t = k["t"].to_numpy(); x = k["x"].to_numpy(); y = k["y"].to_numpy()
     idx = np.searchsorted(t, spike_ts); idx = np.clip(idx, 0, len(t)-1)
