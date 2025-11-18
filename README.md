@@ -1,6 +1,17 @@
 # CA1 Tetrode Place Maps
 
-Python-based spike sorting and spatial maps pipeline for Axona recordings.
+A Python-based spike sorting and spatial mapping pipeline for hippocampal CA1 recordings collected on the Axona system. This project automates the processing of raw tetrode data into interpretable neural and behavioral maps.
+
+## Overview
+This pipeline takes in raw electrophysiology and position-tracking data from Axona tetrode recordings and outputs:
+
+- Spike-sorted units (via MClust cut files or direct tetrode inputs)
+
+- Rate and occupancy-normalized place maps for individual neurons
+
+- Visualization notebooks showing spatial firing patterns across sessions and subjects
+
+- The code was developed to support computational neuroscience research on hippocampal place cells and memory circuits.
 
 ## Environment
 
